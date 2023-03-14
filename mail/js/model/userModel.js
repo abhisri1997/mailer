@@ -43,6 +43,52 @@ class User {
     }
     return mail;
   }
+
+  deleteMail(mailType, mailID) {
+    switch (mailType) {
+      case "inbox":
+        this.inboxMails = this.inboxMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "sent":
+        this.sentMails = this.sentMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "draft":
+        this.draftMails = this.draftMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "trash":
+        this.trashMails = this.trashMails.filter((mail) => mail.id !== mailID);
+        break;
+      default:
+        break;
+    }
+  }
+
+  moveMail(mailType, mailID) {
+    switch (mailType) {
+      case "inbox":
+        const inboxMail = this.inboxMails.find((mail) => mail.id === mailID);
+        this.trashMails.push(inboxMail);
+        this.inboxMails = this.inboxMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "sent":
+        const sentMail = this.sentMails.find((mail) => mail.id === mailID);
+        this.trashMails.push(sentMail);
+        this.sentMails = this.sentMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "draft":
+        const draftMail = this.draftMails.find((mail) => mail.id === mailID);
+        this.trashMails.push(draftMail);
+        this.draftMails = this.draftMails.filter((mail) => mail.id !== mailID);
+        break;
+      case "trash":
+        const trashMail = this.trashMails.find((mail) => mail.id === mailID);
+        this.trashMails = this.trashMails.filter((mail) => mail.id !== mailID);
+        break;
+      default:
+        break;
+    }
+  }
+
   getSentMails() {
     return this.sentMails;
   }

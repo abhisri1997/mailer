@@ -1,6 +1,8 @@
 import fetchUserDetails from "./fetchUser.js";
 import getMailContainerHTML from "./getMailContainerHTML.js";
 
+const mailContainerSelector = document.querySelector(".mail-container");
+
 const observer = new MutationObserver(function (mutations) {
   mutations.forEach(function (mutation) {
     mutation.target.querySelectorAll(".mail-item").forEach(function (node) {
@@ -14,9 +16,7 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 (async () => {
   //DOM Selectors
-  const userNameSelector = document.querySelector(".user-name > h1");
   const userLogoutSelector = document.querySelector(".user-logout");
-  const mailContainerSelector = document.querySelector(".mail-container");
   const composeFolderSelector = document.querySelector(".compose-folder");
   const inboxFolderSelector = document.querySelector(".inbox-folder");
   const sentFolderSelector = document.querySelector(".sent-folder");
@@ -27,104 +27,131 @@ observer.observe(document.body, { childList: true, subtree: true });
   const user = await fetchUserDetails();
 
   //Initialize user info
-  initUserInfo(userNameSelector, user);
+  initUserInfo(user);
 
   //Initialize inbox on first load
-  initInbox(mailContainerSelector, user);
+  initInbox(user);
 
   //Event Listeners
 
   // Inbox folder click event listener
   inboxFolderSelector.addEventListener("click", () => {
-    initInbox(mailContainerSelector, user);
+    initInbox(user);
   });
 
   // Sent folder click event listener
   sentFolderSelector.addEventListener("click", () => {
-    initSentMail(mailContainerSelector, user);
+    initSentMail(user);
   });
 
   // Draft folder click event listener
   draftFolderSelector.addEventListener("click", () => {
-    initDraftMail(mailContainerSelector, user);
+    initDraftMail(user);
   });
 
   // Trash folder click event listener
   trashFolderSelector.addEventListener("click", () => {
-    initTrashMail(mailContainerSelector, user);
+    initTrashMail(user);
   });
 
   // Mail item click event listener
   document.addEventListener("mailItemLoaded", () => {
     const mailItemSelector = document.querySelectorAll(".mail-item");
-    mailItemSelector.forEach((mailItem) => {
-      mailItemEvenListener(mailItem, user);
-    });
+    const mailActionSelector = document.querySelectorAll(".mail-action");
+    mailItemEvenListener(mailItemSelector, user);
+    mailActionEvenListener(mailActionSelector, user);
   });
 })();
 
-function mailItemEvenListener(mailItem, user) {
-  mailItem.addEventListener("click", () => {
-    const activeMailSelector = document.querySelector(".active-mail");
-    if (activeMailSelector) {
-      activeMailSelector.classList.remove("active-mail");
-    }
-    mailItem.classList.add("active-mail");
-    const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
-    const mailType = mailItem.getAttribute("data-mail-type");
-    const mail = user.getMail(mailType, mailId);
-    openMail(mailType, mail);
+function mailItemEvenListener(mailItemSelector, user) {
+  mailItemSelector.forEach((mailItem) => {
+    mailItem.addEventListener("click", () => {
+      const activeMailSelector = document.querySelector(".active-mail");
+      if (activeMailSelector) {
+        activeMailSelector.classList.remove("active-mail");
+      }
+      mailItem.classList.add("active-mail");
+      const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
+      const mailType = mailItem.getAttribute("data-mail-type");
+      const mail = user.getMail(mailType, mailId);
+      openMail(mailType, mail);
+    });
   });
 }
 
-function initUserInfo(userNameSelector, user) {
+function mailActionEvenListener(mailActionSelector, user) {
+  mailActionSelector.forEach((mailAction) => {
+    mailAction.addEventListener("click", (e) => {
+      //Mail Action parent selector
+      const mailActionParentSelector = mailAction.parentElement;
+      const mailId = parseInt(
+        mailActionParentSelector.getAttribute("data-mail-id")
+      );
+      const mailType = mailActionParentSelector.getAttribute("data-mail-type");
+      user.deleteMail(mailType, mailId);
+      const activeMailSelector = document.querySelector(".active-mail");
+      if (activeMailSelector) {
+        activeMailSelector.classList.remove("active-mail");
+      }
+      const mailContainerSelector = document.querySelector(".mail-container");
+      mailContainerSelector.innerHTML = getMailContainerHTML(mailType, user);
+      const mainContentSelector = document.querySelector(".content-container");
+      mainContentSelector.innerHTML = "";
+      const noMail = isFolderEmpty(user);
+      e.stopPropagation();
+    });
+  });
+}
+
+function initUserInfo(user) {
+  const userNameSelector = document.querySelector(".user-name > h1");
   userNameSelector.textContent = user.getUserName();
   userNameSelector.setAttribute("data-user-name", user.getUserName());
   userNameSelector.setAttribute("data-user-email", user.getUserEmail());
 }
 
-function initInbox(mailContainerSelector, user) {
+function initInbox(user) {
   //Fill Inbox
   mailContainerSelector.innerHTML = getMailContainerHTML("inbox", user);
 
   //If mailContainerSelector is empty, show no mail message
-  const noMail = isFolderEmpty(mailContainerSelector, user);
+  const noMail = isFolderEmpty(user);
 
   //Active Inbox
   const inboxFolderSelector = document.querySelector(".inbox-folder");
   toggleActiveFolder(inboxFolderSelector);
 }
 
-function initSentMail(mailContainerSelector, user) {
+function initSentMail(user) {
   //Fill Sent Mail
   mailContainerSelector.innerHTML = getMailContainerHTML("sent", user);
 
   //If mailContainerSelector is empty, show no mail message
-  isFolderEmpty(mailContainerSelector, user);
+  isFolderEmpty(user);
 
   //Active Sent Mail
   const sentFolderSelector = document.querySelector(".sent-folder");
   toggleActiveFolder(sentFolderSelector);
 }
 
-function initDraftMail(mailContainerSelector, user) {
+function initDraftMail(user) {
   //Fill Draft Mail
   mailContainerSelector.innerHTML = getMailContainerHTML("draft", user);
 
   //If mailContainerSelector is empty, show no mail message
-  isFolderEmpty(mailContainerSelector, user);
+  isFolderEmpty(user);
 
   //Active Draft Mail
   const draftFolderSelector = document.querySelector(".draft-folder");
   toggleActiveFolder(draftFolderSelector);
 }
 
-function initTrashMail(mailContainerSelector, user) {
+function initTrashMail(user) {
   //Fill Trash Mail
   mailContainerSelector.innerHTML = getMailContainerHTML("trash", user);
 
   //If mailContainerSelector is empty, show no mail message
-  isFolderEmpty(mailContainerSelector, user);
+  isFolderEmpty(user);
 
   //Active Trash Mail
   const trashFolderSelector = document.querySelector(".trash-folder");
@@ -140,7 +167,7 @@ function toggleActiveFolder(folderSelector) {
 }
 
 //TODO - Refactor this function to seperate folder check and no mail message
-function isFolderEmpty(mailContainerSelector, user) {
+function isFolderEmpty(user) {
   if (mailContainerSelector.innerHTML === "") {
     const mainContentSelector = document.querySelector(".content-container");
     mainContentSelector.innerHTML = `<div class="no-mail">
