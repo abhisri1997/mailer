@@ -1,6 +1,17 @@
 import fetchUserDetails from "./fetchUser.js";
 import getMailContainerHTML from "./getMailContainerHTML.js";
 
+const observer = new MutationObserver(function (mutations) {
+  mutations.forEach(function (mutation) {
+    mutation.target.querySelectorAll(".mail-item").forEach(function (node) {
+      const mailItemLoadedEvent = new Event("mailItemLoaded");
+      document.dispatchEvent(mailItemLoadedEvent);
+    });
+  });
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+
 (async () => {
   //DOM Selectors
   const userNameSelector = document.querySelector(".user-name > h1");
@@ -42,6 +53,24 @@ import getMailContainerHTML from "./getMailContainerHTML.js";
   trashFolderSelector.addEventListener("click", () => {
     initTrashMail(mailContainerSelector, user);
   });
+
+  // Mail item click event listener
+  document.addEventListener("mailItemLoaded", () => {
+    const mailItemSelector = document.querySelectorAll(".mail-item");
+    mailItemSelector.forEach((mailItem) => {
+      mailItem.addEventListener("click", () => {
+        const activeMailSelector = document.querySelector(".active-mail");
+        if (activeMailSelector) {
+          activeMailSelector.classList.remove("active-mail");
+        }
+        mailItem.classList.add("active-mail");
+        const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
+        const mailType = mailItem.getAttribute("data-mail-type");
+        const mail = user.getMail(mailType, mailId);
+        openMail(mailType, mail);
+      });
+    });
+  });
 })();
 
 function initUserInfo(userNameSelector, user) {
@@ -55,9 +84,7 @@ function initInbox(mailContainerSelector, user) {
   mailContainerSelector.innerHTML = getMailContainerHTML("inbox", user);
 
   //If mailContainerSelector is empty, show no mail message
-  isFolderEmpty(mailContainerSelector, user);
-
-  //Else open first mailbox
+  const noMail = isFolderEmpty(mailContainerSelector, user);
 
   //Active Inbox
   const inboxFolderSelector = document.querySelector(".inbox-folder");
@@ -108,15 +135,18 @@ function toggleActiveFolder(folderSelector) {
   folderSelector.classList.add("active-folder");
 }
 
+//TODO - Refactor this function to seperate folder check and no mail message
 function isFolderEmpty(mailContainerSelector, user) {
   if (mailContainerSelector.innerHTML === "") {
     const mainContentSelector = document.querySelector(".content-container");
     mainContentSelector.innerHTML = `<div class="no-mail">
         <p>Empty...</p>
     </div>`;
+    return true;
   } else {
     initFirstMail(user);
   }
+  return false;
 }
 
 function initFirstMail(user) {
