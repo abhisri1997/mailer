@@ -58,20 +58,24 @@ observer.observe(document.body, { childList: true, subtree: true });
   document.addEventListener("mailItemLoaded", () => {
     const mailItemSelector = document.querySelectorAll(".mail-item");
     mailItemSelector.forEach((mailItem) => {
-      mailItem.addEventListener("click", () => {
-        const activeMailSelector = document.querySelector(".active-mail");
-        if (activeMailSelector) {
-          activeMailSelector.classList.remove("active-mail");
-        }
-        mailItem.classList.add("active-mail");
-        const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
-        const mailType = mailItem.getAttribute("data-mail-type");
-        const mail = user.getMail(mailType, mailId);
-        openMail(mailType, mail);
-      });
+      mailItemEvenListener(mailItem, user);
     });
   });
 })();
+
+function mailItemEvenListener(mailItem, user) {
+  mailItem.addEventListener("click", () => {
+    const activeMailSelector = document.querySelector(".active-mail");
+    if (activeMailSelector) {
+      activeMailSelector.classList.remove("active-mail");
+    }
+    mailItem.classList.add("active-mail");
+    const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
+    const mailType = mailItem.getAttribute("data-mail-type");
+    const mail = user.getMail(mailType, mailId);
+    openMail(mailType, mail);
+  });
+}
 
 function initUserInfo(userNameSelector, user) {
   userNameSelector.textContent = user.getUserName();
