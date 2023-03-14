@@ -1,1 +1,34 @@
-sendgrid.env
+# Ignore node_modules
+node_modules
+# Ignore .env
+.env
+# Ignore package-lock.json
+package-lock.json
+# Ignore .gitignore
+.gitignore
+# Ignore .git
+.git
+# Ignore .vscode
+.vscode
+# Ignore .DS_Store
+.DS_Store
+# Ignore .env
+.env
+# Ignore .env.example
+.env.example
+# Ignore .env.local
+.env.local
+# Ignore .env.local.example
+.env.local.example
+# Ignore .env.development
+.env.development
+# Ignore .env.development.local
+.env.development.local
+# Ignore .env.test
+.env.test
+# Ignore .env.test.local
+.env.test.local
+# Ignore .env.production
+.env.production
+# Ignore .env.production.local
+.env.production.local
