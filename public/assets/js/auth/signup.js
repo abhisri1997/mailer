@@ -31,7 +31,7 @@ const signup = (
     .then((res) => res.json())
     .then((data) => {
       console.log(data);
-      window.location.href = `${window.location.host}/mail`;
+      window.location.href = `/mail`;
     })
     .catch((err) => console.log(err));
 };

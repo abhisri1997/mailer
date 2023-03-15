@@ -338,7 +338,7 @@ function toggleActiveFolder(folderSelector) {
 //TODO - Refactor this function to seperate folder check and no mail message
 function isFolderEmpty(user) {
   if (mailContainerSelector.innerHTML === "") {
-    const mainContentSelector = document.querySelector(".content-container");
+    const mainContentSelector = document.querySelector(".mail-info-container");
     mainContentSelector.innerHTML = `<div class="no-mail">
         <p>Empty...</p>
     </div>`;
