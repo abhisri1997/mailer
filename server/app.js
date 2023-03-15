@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const router = require("./routes/router");
 const session = require("express-session");
-const generateSecretKey = require("./logic/generateSecretKey");
+const generateSecretKey = require("./config/generateSecretKey");
 
 const app = express();
 

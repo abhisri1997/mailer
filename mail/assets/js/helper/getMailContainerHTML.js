@@ -7,7 +7,7 @@ const getMailContainerHTML = (type, user) => {
     case "sent":
       mailHTML = getSentMails(user, mailHTML);
       break;
-    case "draft":
+    case "drafts":
       mailHTML = getDraftMails(user, mailHTML);
       break;
     case "trash":
@@ -112,7 +112,7 @@ const getDraftMails = (user, mailHTML) => {
       const toName = mail.to.split(" ")[0];
       const subject = mail.sub;
       const messageSummary = user.getMessageSummary(mail.message);
-      const mailType = "draft";
+      const mailType = "drafts";
       const mailID = mail.id;
       mailHTML += createMailTemplate(
         mailType,
@@ -135,19 +135,22 @@ const getTrashMails = (user, mailHTML) => {
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
 
     trashMails.forEach((mail, idx) => {
-      const fromName = mail.from.split(" ")[0];
-      const subject = mail.sub;
-      const messageSummary = user.getMessageSummary(mail.message);
-      const mailType = "trash";
-      const mailID = mail.id;
-      mailHTML += createMailTemplate(
-        mailType,
-        idx,
-        mailID,
-        fromName,
-        subject,
-        messageSummary
-      );
+      if (mail) {
+        const fetchFrom = mail.from ? mail.from : mail.to;
+        const fromName = fetchFrom.split(" ")[0];
+        const subject = mail?.sub;
+        const messageSummary = user.getMessageSummary(mail?.message);
+        const mailType = "trash";
+        const mailID = mail?.id;
+        mailHTML += createMailTemplate(
+          mailType,
+          idx,
+          mailID,
+          fromName,
+          subject,
+          messageSummary
+        );
+      }
     });
   }
   return mailHTML;

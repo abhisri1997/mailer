@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const isAuthenticatedUser = require("../logic/isAuthenticatedUser");
+const isAuthenticatedUser = require("../middleware/isAuthenticatedUser");
 const loginController = require("./../controller/loginController");
 const signupController = require("./../controller/signupController");
 const logoutController = require("./../controller/logoutController");
@@ -25,6 +25,16 @@ router.get("/users/:id", isAuthenticatedUser, (req, res) => {
   if (!user) {
     res.status(404).send("The user with the given ID was not found.");
   }
+  res.send(user);
+});
+
+// Delete a mail item
+router.put("/mail/:mailType/:mailId", isAuthenticatedUser, (req, res) => {
+  const mailType = req.params.mailType;
+  const mailId = parseInt(req.params.mailId);
+  const user = users.find((user) => user.id === parseInt(req.session.user_id));
+  user[mailType] = user[mailType].filter((mail) => mail.id !== mailId);
+  console.log(user[mailType]);
   res.send(user);
 });
 

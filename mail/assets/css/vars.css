@@ -4,4 +4,5 @@
   --logo-color: #7fe55b;
   --side-nav: #118a7c;
   --mail-container-bg: #3c403d;
+  --dynamic-grid-template-columns: auto auto 3fr;
 }

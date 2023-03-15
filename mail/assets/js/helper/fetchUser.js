@@ -1,5 +1,4 @@
-import User from "./model/userModel.js";
-import users from "./data/users.js";
+import User from "../model/userModel.js";
 
 const fetchUserDetails = async () => {
   const userID = document.cookie.split("=")[1];
