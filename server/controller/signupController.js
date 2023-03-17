@@ -20,7 +20,6 @@ const signupController = (req, res) => {
       trash,
     };
     users.push(newUser);
-    console.log("New User Created", users);
     req.session.user_id = newUser.id;
     res.cookie("userID", newUser.id, {
       expires: new Date(Date.now() + 900000), // 15 minutes

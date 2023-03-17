@@ -5,59 +5,34 @@ const loginController = require("./../controller/loginController");
 const signupController = require("./../controller/signupController");
 const logoutController = require("./../controller/logoutController");
 const users = require("./../data/users");
+const { getSingleUser } = require("./../controller/userController");
+const { updateMail, sendMail } = require("../controller/mailController");
 
 const router = express.Router();
 
+// Log In user
 router.post("/login", loginController);
+
+// Sign Up user
 router.post("/signup", signupController);
 
-// Serve mail folder if user is authentic
+// Serve mail folder if user is authenticated
 router.use(
   "/mail",
   isAuthenticatedUser,
   express.static(path.join(__dirname, "./../../mail"))
 );
+
+// Log out user
 router.get("/logout", logoutController);
 
 // Get a single user
-router.get("/users/:id", isAuthenticatedUser, (req, res) => {
-  const user = users.find((user) => user.id === parseInt(req.params.id));
-  if (!user) {
-    res.status(404).send("The user with the given ID was not found.");
-  }
-  res.send(user);
-});
+router.get("/users/:id", isAuthenticatedUser, getSingleUser);
 
 // Delete a mail item
-router.put("/mail/:mailType/:mailId", isAuthenticatedUser, (req, res) => {
-  const mailType = req.params.mailType;
-  const mailId = parseInt(req.params.mailId);
-  const user = users.find((user) => user.id === parseInt(req.session.user_id));
-  user[mailType] = user[mailType].filter((mail) => mail.id !== mailId);
-  console.log(user[mailType]);
-  res.send(user);
-});
+router.put("/mail/:mailType/:mailId", isAuthenticatedUser, updateMail);
 
-// // Update a user
-// router.put("/users/:id", (req, res) => {
-//   const user = users.find((user) => user.id === parseInt(req.params.id));
-//   if (!user) {
-//     res.status(404).send("The user with the given ID was not found.");
-//   }
-//   user.username = req.body.username;
-//   user.password = req.body.password;
-//   res.send(user);
-// });
-
-// // Delete a user
-// router.delete("/users/:id", (req, res) => {
-//   const user = users.find((user) => user.id === parseInt(req.params.id));
-//   if (!user) {
-//     res.status(404).send("The user with the given ID was not found.");
-//   }
-//   const index = users.indexOf(user);
-//   users.splice(index, 1);
-//   res.send(user);
-// });
+// Send a mail and update the users inbox and sent folders
+router.put("/mail/sendMail", isAuthenticatedUser, sendMail);
 
 module.exports = router;

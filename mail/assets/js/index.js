@@ -80,18 +80,18 @@ observer.observe(document.body, { childList: true, subtree: true });
   document.addEventListener("mailItemLoaded", () => {
     const mailItemSelector = document.querySelectorAll(".mail-item");
     const mailActionSelector = document.querySelectorAll(".mail-action");
-    mailItemEvenListener(mailItemSelector, user);
-    mailActionEvenListener(mailActionSelector, user);
+    mailItemEventListener(mailItemSelector, user);
+    mailActionEventListener(mailActionSelector, user);
   });
 
   document.addEventListener("sendDraftLoaded", () => {
     const sendDraftSelector = document.querySelector(".send-draft-btn");
-    sendDraftEvenListener(sendDraftSelector, user);
+    sendDraftEventListener(sendDraftSelector, user);
   });
 
   document.addEventListener("composeMailLoaded", () => {
     const sendMailSelector = document.querySelector(".compose-mail");
-    sendMailEvenListener(sendMailSelector, user);
+    sendMailEventListener(sendMailSelector, user);
   });
 })();
 
@@ -112,7 +112,7 @@ function getComposeMailHTML() {
   `;
 }
 
-function sendMailEvenListener(sendMailSelector, user) {
+function sendMailEventListener(sendMailSelector, user) {
   sendMailSelector.addEventListener("submit", (e) => {
     e.preventDefault();
     const toName = document.querySelector("#to").value.split("@")[0];
@@ -133,11 +133,27 @@ function sendMailEvenListener(sendMailSelector, user) {
       timeStamp: createTimeStamp(),
       message,
     };
-    user.sendMail(mail);
-    console.log(user.getSentMails());
+    const allMail = user.sendMail(mail);
+    updateServerData(mail, allMail);
     initSentMail(user);
     e.stopPropagation();
   });
+}
+
+function updateServerData(newMail, allMail) {
+  const url = "/mail/sendMail/";
+  const options = {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ newMail, allMail }),
+  };
+  fetch(url, options)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+    });
 }
 
 const createTimeStamp = () => {
@@ -177,7 +193,8 @@ const createTimeStamp = () => {
   return timestamp;
 };
 
-function mailItemEvenListener(mailItemSelector, user) {
+function mailItemEventListener(mailItemSelector, user) {
+  console.log(mailItemSelector);
   mailItemSelector.forEach((mailItem) => {
     mailItem.addEventListener("click", () => {
       const activeMailSelector = document.querySelector(".active-mail");
@@ -193,7 +210,7 @@ function mailItemEvenListener(mailItemSelector, user) {
   });
 }
 
-function mailActionEvenListener(mailActionSelector, user) {
+function mailActionEventListener(mailActionSelector, user) {
   mailActionSelector.forEach((mailAction) => {
     mailAction.addEventListener("click", (e) => {
       //Mail Action parent selector
@@ -202,7 +219,8 @@ function mailActionEvenListener(mailActionSelector, user) {
         mailActionParentSelector.getAttribute("data-mail-id")
       );
       const mailType = mailActionParentSelector.getAttribute("data-mail-type");
-      user.deleteMail(mailType, mailId);
+      const updatedMail = user.deleteMail(mailType, mailId);
+      console.log(updatedMail);
       const activeMailSelector = document.querySelector(".active-mail");
       if (activeMailSelector) {
         activeMailSelector.classList.remove("active-mail");
@@ -233,13 +251,12 @@ function mailActionEvenListener(mailActionSelector, user) {
   });
 }
 
-function sendDraftEvenListener(sendDraftSelector, user) {
+function sendDraftEventListener(sendDraftSelector, user) {
   sendDraftSelector.addEventListener("click", (e) => {
     const activeMailSelector = document.querySelector(".active-mail");
     const mailId = parseInt(activeMailSelector.getAttribute("data-mail-id"));
-    user.sendDraftMail(mailId);
-    console.log(user.getDraftMails());
-    console.log(user.getSentMails());
+    const updatedMails = user.sendDraftMail(mailId);
+    console.log(updatedMails);
     const mailContainerSelector = document.querySelector(".mail-container");
     mailContainerSelector.innerHTML = getMailContainerHTML("drafts", user);
     const mainContentSelector = document.querySelector(".content-container");
