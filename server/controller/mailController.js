@@ -20,8 +20,8 @@ const sendMail = (req, res) => {
   // Push new mail to the recipients inbox
   const recipientsEmail = newMail.to.split(" ")[1];
   const recipient = users.find((user) => user.email === recipientsEmail);
-  const recipientLastMail = recipient.inbox?.at(-1);
-  const recipientLastMailId = recipientLastMail?.id;
+  const recipientLastMail = recipient.inbox[recipient.inbox.length - 1];
+  const recipientLastMailId = recipientLastMail.id;
   const newMailId = recipientLastMailId ? recipientLastMailId + 1 : 1;
   const mail = {
     id: newMailId,
