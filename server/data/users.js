@@ -8,7 +8,7 @@ const users = [
     sent: [
       {
         id: 1,
-        to: "XYZ xyz@mailer.com",
+        to: "XYZ - xyz@mailer.com",
         sub: "The resturant",
         timeStamp: "Mar 7, 2023, 9:35 AM",
         message: "Hi, XYZ thank you for your interest in our resturant",
@@ -17,14 +17,14 @@ const users = [
     inbox: [
       {
         id: 1,
-        from: "XYZ xyz@mailer.com",
+        from: "XYZ - xyz@mailer.com",
         sub: "The resturant",
         timeStamp: "Mar 7, 2023, 8:55 AM",
         message: "Hello, I am interested in your resturant",
       },
       {
         id: 2,
-        from: "Flipkart no-reply@flipkart.com",
+        from: "Flipkart - no-reply@flipkart.com",
         sub: "Big Billion Celebration is here...",
         timeStamp: "Mar 8, 2023, 8:55 AM",
         message: `
@@ -41,7 +41,7 @@ const users = [
       },
       {
         id: 3,
-        from: "Amazon no-reply@amazon.com",
+        from: "Amazon - no-reply@amazon.com",
         sub: "Amazon Great Indian Festival",
         timeStamp: "Mar 8, 2023, 8:55 PM",
         message: "lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -50,7 +50,7 @@ const users = [
     drafts: [
       {
         id: 1,
-        to: "XYZ xyz@mailer.com",
+        to: "XYZ - xyz@mailer.com",
         sub: "The resturant",
         timeStamp: "Mar 7, 2023, 9:55 AM",
         message: "Let me know when can we schedule a meeting",
@@ -59,7 +59,7 @@ const users = [
     trash: [
       {
         id: 1,
-        from: "ABC abc@phishing.com",
+        from: "ABC - abc@phishing.com",
         sub: "Click here",
         timeStamp: "Mar 8, 2023, 8:55 AM",
         message: "Click here to win a free iPhone",

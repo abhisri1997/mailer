@@ -388,13 +388,13 @@ function getMailContentHTML(mailType, mail) {
   let fromName = "";
   let fromEmail = "";
   if (mail.from) {
-    fromName = mail.from.split(" ")[0];
-    fromEmail = mail.from.split(" ")[1];
+    fromName = mail.from.split(" - ")[0];
+    fromEmail = mail.from.split(" - ")[1];
   } else {
     fromName = toName;
     fromEmail = toEmail;
-    toName = mail.to.split(" ")[0];
-    toEmail = mail.to.split(" ")[1];
+    toName = mail.to.split(" - ")[0];
+    toEmail = mail.to.split(" - ")[1];
   }
   const subject = mail.sub;
   const timeStamp = mail.timeStamp;

@@ -57,7 +57,7 @@ const getInboxMails = (user, mailHTML) => {
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
 
     inboxMails.forEach((mail, idx) => {
-      const fromName = mail.from.split(" ")[0];
+      const fromName = mail.from.split(" - ")[0];
       const subject = mail.sub;
       const messageSummary = user.getMessageSummary(mail.message);
       const mailType = "inbox";
@@ -83,7 +83,7 @@ const getSentMails = (user, mailHTML) => {
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
 
     sentMails.forEach((mail, idx) => {
-      const toName = mail.to.split(" ")[0];
+      const toName = mail.to.split(" - ")[0];
       const subject = mail.sub;
       const messageSummary = user.getMessageSummary(mail.message);
       const mailType = "sent";
@@ -109,7 +109,7 @@ const getDraftMails = (user, mailHTML) => {
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
 
     draftMails.forEach((mail, idx) => {
-      const toName = mail.to.split(" ")[0];
+      const toName = mail.to.split(" - ")[0];
       const subject = mail.sub;
       const messageSummary = user.getMessageSummary(mail.message);
       const mailType = "drafts";
@@ -137,7 +137,7 @@ const getTrashMails = (user, mailHTML) => {
     trashMails.forEach((mail, idx) => {
       if (mail) {
         const fetchFrom = mail.from ? mail.from : mail.to;
-        const fromName = fetchFrom.split(" ")[0];
+        const fromName = fetchFrom.split(" - ")[0];
         const subject = mail?.sub;
         const messageSummary = user.getMessageSummary(mail?.message);
         const mailType = "trash";
