@@ -9,36 +9,6 @@ const updateMail = (req, res) => {
   res.send(user);
 };
 
-// const sendMail = (req, res) => {
-//   const { newMail } = req.body;
-//   // Push new mail to the senders sent folder
-//   const sender = users.find(
-//     (user) => user.id === parseInt(req.session.user_id)
-//   );
-//   sender.sent.push(newMail);
-//   console.log(sender);
-//   // Push new mail to the recipients inbox
-//   const recipientsEmail = newMail.to.split(" ")[1];
-//   const recipient = users.find((user) => user.email === recipientsEmail);
-//   const recipientLastMail = recipient.inbox[recipient.inbox.length - 1];
-//   const recipientLastMailId = recipientLastMail.id;
-//   const newMailId = recipientLastMailId ? recipientLastMailId + 1 : 1;
-//   const mail = {
-//     id: newMailId,
-//     from: sender.name + " " + sender.email,
-//     sub: newMail.sub,
-//     timeStamp: newMail.timeStamp,
-//     message: newMail.message,
-//   };
-//   recipient.inbox.push(mail);
-//   if (recipientLastMail) {
-
-//   }
-
-//   console.log(recipient);
-//   res.status(200).send({ message: "Mail sent" });
-// };
-
 const sendMail = (req, res) => {
   const { newMail } = req.body;
   const sender = users.find(

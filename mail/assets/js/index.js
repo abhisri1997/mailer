@@ -193,10 +193,29 @@ const createTimeStamp = () => {
   return timestamp;
 };
 
+// function mailItemEventListener(mailItemSelector, user) {
+//   console.log(mailItemSelector);
+//   mailItemSelector.forEach((mailItem) => {
+//     mailItem.addEventListener("click", () => {
+//       const activeMailSelector = document.querySelector(".active-mail");
+//       if (activeMailSelector) {
+//         activeMailSelector.classList.remove("active-mail");
+//       }
+//       mailItem.classList.add("active-mail");
+//       const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
+//       const mailType = mailItem.getAttribute("data-mail-type");
+//       const mail = user.getMail(mailType, mailId);
+//       openMail(mailType, mail);
+//     });
+//   });
+// }
+
 function mailItemEventListener(mailItemSelector, user) {
   console.log(mailItemSelector);
+
   mailItemSelector.forEach((mailItem) => {
-    mailItem.addEventListener("click", () => {
+    mailItem.addEventListener("click", (e) => {
+      e.stopPropagation();
       const activeMailSelector = document.querySelector(".active-mail");
       if (activeMailSelector) {
         activeMailSelector.classList.remove("active-mail");
@@ -204,31 +223,51 @@ function mailItemEventListener(mailItemSelector, user) {
       mailItem.classList.add("active-mail");
       const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
       const mailType = mailItem.getAttribute("data-mail-type");
-      const mail = user.getMail(mailType, mailId);
-      openMail(mailType, mail);
+      if (user && typeof user.getMail === "function") {
+        const mail = user.getMail(mailType, mailId);
+        openMail(mailType, mail);
+      } else {
+        console.error(
+          "Invalid user object or implementation of getMail method"
+        );
+      }
     });
   });
 }
 
 function mailActionEventListener(mailActionSelector, user) {
   mailActionSelector.forEach((mailAction) => {
-    mailAction.addEventListener("click", (e) => {
-      //Mail Action parent selector
-      const mailActionParentSelector = mailAction.parentElement;
-      const mailId = parseInt(
-        mailActionParentSelector.getAttribute("data-mail-id")
+    mailAction.addEventListener("click", (event) => {
+      event.stopPropagation();
+
+      const mailActionParent = mailAction.closest(
+        "[data-mail-id][data-mail-type]"
       );
-      const mailType = mailActionParentSelector.getAttribute("data-mail-type");
+      if (!mailActionParent) return;
+
+      const mailId = parseInt(mailActionParent.getAttribute("data-mail-id"));
+      if (isNaN(mailId)) return;
+
+      const mailType = mailActionParent.getAttribute("data-mail-type");
+
       const updatedMail = user.deleteMail(mailType, mailId);
       console.log(updatedMail);
-      const activeMailSelector = document.querySelector(".active-mail");
-      if (activeMailSelector) {
-        activeMailSelector.classList.remove("active-mail");
+
+      const activeMail = document.querySelector(".active-mail");
+      if (activeMail) {
+        activeMail.classList.remove("active-mail");
       }
-      const mailContainerSelector = document.querySelector(".mail-container");
-      mailContainerSelector.innerHTML = getMailContainerHTML(mailType, user);
-      const mainContentSelector = document.querySelector(".content-container");
-      mainContentSelector.innerHTML = "";
+
+      const mailContainer = document.querySelector(".mail-container");
+      if (!mailContainer) return;
+
+      const mailContainerHTML = getMailContainerHTML(mailType, user);
+      mailContainer.innerHTML = mailContainerHTML;
+
+      const mainContent = document.querySelector(".content-container");
+      if (mainContent) {
+        mainContent.innerHTML = "";
+      }
 
       // Update server with new user data
       fetch(`/mail/${mailType}/${mailId}`, {
@@ -237,16 +276,22 @@ function mailActionEventListener(mailActionSelector, user) {
           "Content-Type": "application/json",
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(
+              `Error updating mail ${mailId} of type ${mailType}: ${res.status} ${res.statusText}`
+            );
+          }
+          return res.json();
+        })
         .then((data) => {
           console.log(data);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
         });
 
       isFolderEmpty(user);
-      e.stopPropagation();
     });
   });
 }

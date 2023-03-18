@@ -50,7 +50,7 @@ const createMailTemplate = (
 };
 
 const getInboxMails = (user, mailHTML) => {
-  //Sort mail by received time
+  //Sort inbox mail by received time
   if (user.getInboxMails().length > 0) {
     const inboxMails = user
       .getInboxMails()
@@ -77,7 +77,7 @@ const getInboxMails = (user, mailHTML) => {
 
 const getSentMails = (user, mailHTML) => {
   if (user.getSentMails().length > 0) {
-    //Sort mail by received time
+    //Sort sent mail by received time
     const sentMails = user
       .getSentMails()
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
@@ -103,7 +103,7 @@ const getSentMails = (user, mailHTML) => {
 
 const getDraftMails = (user, mailHTML) => {
   if (user.getDraftMails().length > 0) {
-    //Sort mail by received time
+    //Sort draft mail by received time
     const draftMails = user
       .getDraftMails()
       .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
@@ -129,10 +129,8 @@ const getDraftMails = (user, mailHTML) => {
 
 const getTrashMails = (user, mailHTML) => {
   if (user.getTrashMails().length > 0) {
-    //Sort mail by received time
-    const trashMails = user
-      .getTrashMails()
-      .sort((a, b) => new Date(b.timeStamp) - new Date(a.timeStamp));
+    //Sort trash mail according to unique id
+    const trashMails = user.getTrashMails().sort((a, b) => b.id - a.id);
 
     trashMails.forEach((mail, idx) => {
       if (mail) {

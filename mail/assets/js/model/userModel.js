@@ -37,6 +37,28 @@ class User {
   getMessageSummary(message) {
     return message?.substring(0, 100) + "...";
   }
+
+  getLastMailId(mailType) {
+    let lastMailId = 0;
+    switch (mailType) {
+      case "inbox":
+        lastMailId = this.inboxMails.length;
+        break;
+      case "sent":
+        lastMailId = this.sentMails.length;
+        break;
+      case "drafts":
+        lastMailId = this.draftMails.length;
+        break;
+      case "trash":
+        lastMailId = this.trashMails.length;
+        break;
+      default:
+        break;
+    }
+    return lastMailId;
+  }
+
   getMail(mailType, mailID) {
     let mail;
 
@@ -86,9 +108,13 @@ class User {
 
   moveMail(mailType, mailID) {
     let output = {};
+    const newMailId = this.getLastMailId("trash") + 1;
     switch (mailType) {
       case "inbox":
-        const inboxMail = this.inboxMails.find((mail) => mail.id === mailID);
+        const inboxMail = JSON.parse(
+          JSON.stringify(this.inboxMails.find((mail) => mail.id === mailID))
+        );
+        inboxMail.id = newMailId;
         if (inboxMail) {
           this.trashMails.push(inboxMail);
           this.inboxMails = this.inboxMails.filter(
@@ -98,7 +124,10 @@ class User {
         output = { trash: this.trashMails, inbox: this.inboxMails };
         break;
       case "sent":
-        const sentMail = this.sentMails.find((mail) => mail.id === mailID);
+        const sentMail = JSON.parse(
+          JSON.stringify(this.sentMails.find((mail) => mail.id === mailID))
+        );
+        sentMail.id = newMailId;
         if (sentMail) {
           this.trashMails.push(sentMail);
           this.sentMails = this.sentMails.filter((mail) => mail.id !== mailID);
@@ -106,7 +135,10 @@ class User {
         output = { trash: this.trashMails, sent: this.sentMails };
         break;
       case "drafts":
-        const draftMail = this.draftMails.find((mail) => mail.id === mailID);
+        const draftMail = JSON.parse(
+          JSON.stringify(this.draftMails.find((mail) => mail.id === mailID))
+        );
+        draftMail.id = newMailId;
         if (draftMail) {
           this.trashMails.push(draftMail);
           this.draftMails = this.draftMails.filter(
