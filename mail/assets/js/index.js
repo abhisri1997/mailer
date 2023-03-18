@@ -1,5 +1,7 @@
 import fetchUserDetails from "./helper/fetchUser.js";
 import getMailContainerHTML from "./helper/getMailContainerHTML.js";
+import createTimeStamp from "./helper/createTimeStamp.js";
+import { sendMailToServer, updateMail } from "./helper/updateServer.js";
 
 const mailContainerSelector = document.querySelector(".mail-container");
 const userInfoSelector = document.querySelector(".user-name > h1");
@@ -134,64 +136,11 @@ function sendMailEventListener(sendMailSelector, user) {
       message,
     };
     const allMail = user.sendMail(mail);
-    updateServerData(mail, allMail);
+    sendMailToServer(mail, allMail);
     initSentMail(user);
     e.stopPropagation();
   });
 }
-
-function updateServerData(newMail, allMail) {
-  const url = "/mail/sendMail/";
-  const options = {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ newMail, allMail }),
-  };
-  fetch(url, options)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data);
-    });
-}
-
-const createTimeStamp = () => {
-  // Create a new Date object
-  const now = new Date();
-
-  // Get the month abbreviation
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  const month = monthNames[now.getMonth()];
-
-  // Get the day, year, and time in 12-hour format
-  const day = now.getDate();
-  const year = now.getFullYear();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const time = `${hours % 12 || 12}:${minutes
-    .toString()
-    .padStart(2, "0")} ${ampm}`;
-
-  // Combine the parts into a formatted string
-  const timestamp = `${month} ${day}, ${year}, ${time}`;
-
-  return timestamp;
-};
 
 function mailItemEventListener(mailItemSelector, user) {
   console.log(mailItemSelector);
@@ -233,8 +182,7 @@ function mailActionEventListener(mailActionSelector, user) {
 
       const mailType = mailActionParent.getAttribute("data-mail-type");
 
-      const updatedMail = user.deleteMail(mailType, mailId);
-      console.log(updatedMail);
+      const updatedMails = user.deleteMail(mailType, mailId);
 
       const activeMail = document.querySelector(".active-mail");
       if (activeMail) {
@@ -253,27 +201,7 @@ function mailActionEventListener(mailActionSelector, user) {
       }
 
       // Update server with new user data
-      fetch(`/mail/updateMail`, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedMail),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(
-              `Error updating mail ${mailId} of type ${mailType}: ${res.status} ${res.statusText}`
-            );
-          }
-          return res.json();
-        })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      updateMail(updatedMails);
 
       isFolderEmpty(user);
     });
@@ -281,17 +209,52 @@ function mailActionEventListener(mailActionSelector, user) {
 }
 
 function sendDraftEventListener(sendDraftSelector, user) {
+  if (!sendDraftSelector) {
+    console.error("Send draft selector not found");
+    return;
+  }
+
+  if (!user) {
+    console.error("Invalid user object");
+    return;
+  }
+
   sendDraftSelector.addEventListener("click", (e) => {
+    e.stopPropagation();
+
     const activeMailSelector = document.querySelector(".active-mail");
+    if (!activeMailSelector) {
+      console.error("Active mail selector not found");
+      return;
+    }
     const mailId = parseInt(activeMailSelector.getAttribute("data-mail-id"));
+    if (isNaN(mailId)) {
+      console.error("Invalid mail id");
+      return;
+    }
+
     const updatedMails = user.sendDraftMail(mailId);
-    console.log(updatedMails);
+    if (!updatedMails) {
+      console.error("Updated mail not returned");
+      return;
+    }
+    updateMail(updatedMails);
+
     const mailContainerSelector = document.querySelector(".mail-container");
+    if (!mailContainerSelector) {
+      console.error("Mail container selector not found");
+      return;
+    }
+
     mailContainerSelector.innerHTML = getMailContainerHTML("drafts", user);
     const mainContentSelector = document.querySelector(".content-container");
+    if (!mainContentSelector) {
+      console.error("Main content selector not found");
+      return;
+    }
+
     mainContentSelector.innerHTML = "";
     isFolderEmpty(user);
-    e.stopPropagation();
   });
 }
 
