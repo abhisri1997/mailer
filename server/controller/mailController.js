@@ -1,12 +1,16 @@
 const users = require("../data/users");
 
 const updateMail = (req, res) => {
-  const mailType = req.params.mailType;
-  const mailId = parseInt(req.params.mailId);
+  const objectKeys = Object.keys(req.body);
+  const validKeys = ["inbox", "sent", "drafts", "trash"];
   const user = users.find((user) => user.id === parseInt(req.session.user_id));
-  user[mailType] = user[mailType].filter((mail) => mail.id !== mailId);
-  console.log(user[mailType]);
-  res.send(user);
+  if (!user) {
+    return res.status(400).send({ message: "User not found" });
+  }
+  objectKeys.forEach((key) => {
+    if (validKeys.includes(key)) user[key] = req.body[key];
+  });
+  res.send({ message: "Mail updated" });
 };
 
 const sendMail = (req, res) => {

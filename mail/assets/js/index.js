@@ -193,23 +193,6 @@ const createTimeStamp = () => {
   return timestamp;
 };
 
-// function mailItemEventListener(mailItemSelector, user) {
-//   console.log(mailItemSelector);
-//   mailItemSelector.forEach((mailItem) => {
-//     mailItem.addEventListener("click", () => {
-//       const activeMailSelector = document.querySelector(".active-mail");
-//       if (activeMailSelector) {
-//         activeMailSelector.classList.remove("active-mail");
-//       }
-//       mailItem.classList.add("active-mail");
-//       const mailId = parseInt(mailItem.getAttribute("data-mail-id"));
-//       const mailType = mailItem.getAttribute("data-mail-type");
-//       const mail = user.getMail(mailType, mailId);
-//       openMail(mailType, mail);
-//     });
-//   });
-// }
-
 function mailItemEventListener(mailItemSelector, user) {
   console.log(mailItemSelector);
 
@@ -270,11 +253,12 @@ function mailActionEventListener(mailActionSelector, user) {
       }
 
       // Update server with new user data
-      fetch(`/mail/${mailType}/${mailId}`, {
+      fetch(`/mail/updateMail`, {
         method: "put",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(updatedMail),
       })
         .then((res) => {
           if (!res.ok) {

@@ -30,7 +30,7 @@ router.get("/logout", logoutController);
 router.get("/users/:id", isAuthenticatedUser, getSingleUser);
 
 // Delete a mail item
-router.put("/mail/:mailType/:mailId", isAuthenticatedUser, updateMail);
+router.put("/mail/updateMail", isAuthenticatedUser, updateMail);
 
 // Send a mail and update the users inbox and sent folders
 router.put("/mail/sendMail", isAuthenticatedUser, sendMail);
