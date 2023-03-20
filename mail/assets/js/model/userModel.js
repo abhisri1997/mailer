@@ -275,9 +275,8 @@ class User {
         output = this.trashMail("drafts", mailID);
         break;
       case "trash":
-        output = this.trashMails = this.trashMails.filter(
-          (mail) => mail.id !== mailID
-        );
+        this.trashMails = this.trashMails.filter((mail) => mail.id !== mailID);
+        output = { trash: this.trashMails };
         break;
       default:
         break;
