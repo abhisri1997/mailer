@@ -161,7 +161,14 @@
 .compose-mail textarea {
   height: 200px;
 }
-.compose-mail input[type="submit"] {
+
+.compose-action {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.compose-mail input[type="submit"],
+.compose-mail input[type="button"] {
   background-color: #4caf50;
   color: white;
   padding: 10px 20px;

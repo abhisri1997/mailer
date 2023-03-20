@@ -1,11 +1,11 @@
-export function sendMailToServer(newMail, allMail) {
+export function sendMailToServer(newMail) {
   const url = "/mail/sendMail/";
   const options = {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ newMail, allMail }),
+    body: JSON.stringify({ newMail }),
   };
   fetch(url, options)
     .then((response) => response.json())

@@ -9,18 +9,18 @@ const users = [
       {
         id: 1,
         to: "XYZ - xyz@mailer.com",
-        sub: "The resturant",
+        sub: "The restaurant",
         timeStamp: "Mar 7, 2023, 9:35 AM",
-        message: "Hi, XYZ thank you for your interest in our resturant",
+        message: "Hi, XYZ thank you for your interest in our resta",
       },
     ],
     inbox: [
       {
         id: 1,
         from: "XYZ - xyz@mailer.com",
-        sub: "The resturant",
+        sub: "The restaurant",
         timeStamp: "Mar 7, 2023, 8:55 AM",
-        message: "Hello, I am interested in your resturant",
+        message: "Hello, I am interested in your restaurant",
       },
       {
         id: 2,
@@ -51,7 +51,7 @@ const users = [
       {
         id: 1,
         to: "XYZ - xyz@mailer.com",
-        sub: "The resturant",
+        sub: "The restaurant",
         timeStamp: "Mar 7, 2023, 9:55 AM",
         message: "Let me know when can we schedule a meeting",
       },

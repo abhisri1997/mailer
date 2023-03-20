@@ -93,7 +93,13 @@ observer.observe(document.body, { childList: true, subtree: true });
 
   document.addEventListener("composeMailLoaded", () => {
     const sendMailSelector = document.querySelector(".compose-mail");
-    sendMailEventListener(sendMailSelector, user);
+
+    if (!sendMailSelector) {
+      console.error("Compose mail form not found");
+      return;
+    }
+
+    formEventListener(sendMailSelector, user);
   });
 })();
 
@@ -108,38 +114,81 @@ function getComposeMailHTML() {
 
 		<label for="message">Message:</label>
 		<textarea id="message" name="message" required></textarea>
-
-		<input type="submit" value="Send">
+    
+    <div class="compose-action">
+      <input type="button" value="Discard">
+		  <input type="submit" value="Send">
+    </div>
 	</form>
   `;
 }
 
-function sendMailEventListener(sendMailSelector, user) {
-  sendMailSelector.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const toName = document.querySelector("#to").value.split("@")[0];
-    const toEmail = document.querySelector("#to").value;
-    const to = toName + " " + toEmail;
-    const sub = document.querySelector("#subject").value;
-    const message = document.querySelector("#message").value;
-    const sentMails = user.getSentMails();
-    let lastMailId = 1;
-    if (sentMails.length > 0) {
-      var lastMail = sentMails.at(-1);
-      lastMailId = lastMail.id + 1;
-    }
-    const mail = {
-      id: lastMailId,
-      to,
-      sub,
-      timeStamp: createTimeStamp(),
-      message,
-    };
-    const allMail = user.sendMail(mail);
-    sendMailToServer(mail, allMail);
-    initSentMail(user);
+function formEventListener(sendMailSelector, user) {
+  sendMailSelector.addEventListener("submit", (e) =>
+    submitFormHandler(e, user)
+  );
+
+  const discardMailSelector = document.querySelector(
+    ".compose-action > input[value='Discard']"
+  );
+
+  if (!discardMailSelector) {
+    console.error("Discard mail button not found");
+    return;
+  }
+
+  discardMailEventListener(discardMailSelector, user);
+}
+
+function submitFormHandler(e, user) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  const mail = createNewMail();
+
+  const lastMailId = user.getLastMailId("sent") + 1;
+
+  mail.id = lastMailId;
+
+  const allMail = user.sendMail(mail);
+
+  sendMailToServer(mail);
+  initSentMail(user);
+}
+
+function discardMailEventListener(discardMailSelector, user) {
+  discardMailSelector.addEventListener("click", (e) => {
     e.stopPropagation();
+    e.preventDefault();
+
+    const mail = createNewMail();
+
+    const lastMailId = user.getLastMailId("drafts") + 1;
+
+    mail.id = lastMailId;
+
+    const updatedMails = user.moveToDrafts(mail);
+
+    updateMail(updatedMails);
+    initDraftMail(user);
   });
+}
+
+function createNewMail() {
+  const toName = document.querySelector("#to").value.split("@")[0];
+  const toEmail = document.querySelector("#to").value;
+  const to = toName + " - " + toEmail;
+  const sub = document.querySelector("#subject").value;
+  const message = document.querySelector("#message").value;
+
+  const mail = {
+    id: 0,
+    to,
+    sub,
+    timeStamp: createTimeStamp(),
+    message,
+  };
+  return mail;
 }
 
 function mailItemEventListener(mailItemSelector, user) {
@@ -238,7 +287,21 @@ function sendDraftEventListener(sendDraftSelector, user) {
       console.error("Updated mail not returned");
       return;
     }
+
+    const lastSentMailId = user.getLastMailId("sent");
+    if (isNaN(lastSentMailId)) {
+      console.error("Invalid last sent mail id");
+      return;
+    }
+
+    const mail = user.getMail("sent", lastSentMailId);
+    if (!mail) {
+      console.error("Mail not found");
+      return;
+    }
+
     updateMail(updatedMails);
+    sendMailToServer(mail);
 
     const mailContainerSelector = document.querySelector(".mail-container");
     if (!mailContainerSelector) {
