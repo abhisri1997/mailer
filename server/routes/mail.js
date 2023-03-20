@@ -6,7 +6,6 @@ const isAuthenticatedUser = require("../middleware/isAuthenticatedUser");
 
 // Serve mail folder if user is authenticated
 router.use(
-  "/",
   isAuthenticatedUser,
   express.static(path.join(__dirname, "./../../mail"))
 );
