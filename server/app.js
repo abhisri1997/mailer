@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
-const router = require("./routes/router");
 const session = require("express-session");
 const generateSecretKey = require("./config/generateSecretKey");
+const mailRouter = require("./routes/mail");
 
 const app = express();
 
@@ -24,19 +24,19 @@ app.use(
 );
 
 const staticPath = path.join(__dirname, "./../public");
+// if user is logged in, redirect to /mail else serve static files
+app.use((req, res, next) => {
+  if (req.session.user_id) {
+    console.log("user is logged in");
+    res.redirect("/mail");
+  } else {
+    next();
+  }
+});
+app.use(express.static(staticPath));
 
-router.use(
-  "/",
-  (req, res, next) => {
-    if (!req.session.user_id) {
-      next();
-    } else {
-      res.redirect("/mail");
-    }
-  },
-  express.static(staticPath)
-);
+app.use("/user", require("./routes/user"));
 
-app.use("/", router);
+app.use("/mail", mailRouter);
 
 app.listen(PORT, () => console.log(`Server running on ${HOST}:${PORT}`));

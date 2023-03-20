@@ -21,7 +21,7 @@ const signup = (
     drafts: [],
     trash: [],
   };
-  fetch("/signup", {
+  fetch("/user/signup", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {

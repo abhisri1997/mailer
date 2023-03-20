@@ -7,7 +7,7 @@ const login = (emailSelector, passwordSelector) => {
     password,
   };
 
-  fetch("/login", {
+  fetch("/user/login", {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
