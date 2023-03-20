@@ -192,8 +192,6 @@ function createNewMail() {
 }
 
 function mailItemEventListener(mailItemSelector, user) {
-  console.log(mailItemSelector);
-
   mailItemSelector.forEach((mailItem) => {
     mailItem.addEventListener("click", (e) => {
       e.stopPropagation();

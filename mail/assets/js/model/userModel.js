@@ -289,9 +289,9 @@ class User {
     const newMailId = this.getLastMailId("trash") + 1;
     switch (mailType) {
       case "inbox":
-        const inboxMail = JSON.parse(
-          JSON.stringify(this.inboxMails.find((mail) => mail.id === mailID))
-        );
+        var mailToParse = this.inboxMails.find((mail) => mail.id === mailID);
+        if (!mailToParse) return;
+        const inboxMail = JSON.parse(JSON.stringify(mailToParse));
         inboxMail.id = newMailId;
         if (inboxMail) {
           this.trashMails.push(inboxMail);
@@ -302,9 +302,9 @@ class User {
         output = { trash: this.trashMails, inbox: this.inboxMails };
         break;
       case "sent":
-        const sentMail = JSON.parse(
-          JSON.stringify(this.sentMails.find((mail) => mail.id === mailID))
-        );
+        var mailToParse = this.sentMails.find((mail) => mail.id === mailID);
+        if (!mailToParse) return;
+        const sentMail = JSON.parse(JSON.stringify(mailToParse));
         sentMail.id = newMailId;
         if (sentMail) {
           this.trashMails.push(sentMail);
@@ -313,9 +313,9 @@ class User {
         output = { trash: this.trashMails, sent: this.sentMails };
         break;
       case "drafts":
-        const draftMail = JSON.parse(
-          JSON.stringify(this.draftMails.find((mail) => mail.id === mailID))
-        );
+        var mailToParse = this.draftMails.find((mail) => mail.id === mailID);
+        if (!mailToParse) return;
+        const draftMail = JSON.parse(JSON.stringify(mailToParse));
         draftMail.id = newMailId;
         if (draftMail) {
           this.trashMails.push(draftMail);
@@ -336,9 +336,9 @@ class User {
   }
 
   sendDraftMail(mailID) {
-    const draftMail = JSON.parse(
-      JSON.stringify(this.draftMails.find((mail) => mail.id === mailID))
-    );
+    const mailToParse = this.draftMails.find((mail) => mail.id === mailID);
+    if (!mailToParse) return;
+    const draftMail = JSON.parse(JSON.stringify(mailToParse));
     draftMail.id = this.getLastMailId("sent") + 1;
     draftMail.timeStamp = createTimeStamp();
     this.sentMails.push(draftMail);

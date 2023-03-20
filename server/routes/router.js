@@ -10,18 +10,18 @@ const { updateMail, sendMail } = require("../controller/mailController");
 
 const router = express.Router();
 
-// Log In user
-router.post("/login", loginController);
-
-// Sign Up user
-router.post("/signup", signupController);
-
 // Serve mail folder if user is authenticated
 router.use(
   "/mail",
   isAuthenticatedUser,
   express.static(path.join(__dirname, "./../../mail"))
 );
+
+// Log In user
+router.post("/login", loginController);
+
+// Sign Up user
+router.post("/signup", signupController);
 
 // Log out user
 router.get("/logout", logoutController);
